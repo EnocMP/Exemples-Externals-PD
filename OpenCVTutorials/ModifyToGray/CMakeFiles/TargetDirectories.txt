@@ -1,0 +1,1 @@
+/home/enoc/projecte/OpenCVTutorials/Modify/CMakeFiles/Modify.dir

@@ -1,0 +1,154 @@
+/**************************PAN EXTERNAL*********************************
+This external has two signal inputs and a single float input. The signal
+inputs are mixed according to the third inlet (mixing factor).
+***********************************************************************/
+
+#include "m_pd.h"
+
+/***************************CLASS DECLARATION***************************/
+
+static t_class *pan_tilde_class; //create pan_tilde_class
+
+/***************************DATA SPACE***************************/
+//variables of the class
+typedef struct _pan_tilde {
+	t_object x_obj; //object properties for PD environment
+
+
+	t_sample f_pan; //mixing factor
+			//t_sample type is an audio signal value (floating point)
+	t_sample f;
+
+	t_inlet *x_in2; //pointer to an inlet
+	t_inlet *x_in3;
+	
+	t_outlet *x_out; //pointer to an output
+
+} 
+t_pan_tilde;
+
+/***************************METHODS***************************/
+
+/*The perform routine contains the functionality of the external*/
+t_int *pan_tilde_perform(t_int *w) {
+	t_pan_tilde *x = (t_pan_tilde *)(w[1]); //the first 
+	t_sample *in1 = (t_sample *)(w[2]); 	//cast to the first signal inlet
+	t_sample *in2 = (t_sample *)(w[3]); 	//cast to the second signal inlet
+	t_sample *out = (t_sample *)(w[4]); 	//cast to the first output
+	int n= (int)(w[5]); 	    		//cast to the length of the signal vector
+
+	//t_sample f_pan = (x->f_pan<0)?0.0:(x->f_pan>1)?1.0:x->f_pan; //keep f_pan between 0.0 <-> 1.0
+	t_sample f_pan = x->f_pan;
+	
+	
+	post ("f_pan val %f", f_pan);		
+	while (n--) {//executes n times
+		*out++ = (*in1++)*(1-f_pan)+(*in2++)*f_pan;
+				
+	}	
+	return (w+6); //return the next memory position
+}
+
+/*The pan_tilde_dsp method adds a perform-routine to the DSP-tree.*/
+void pan_tilde_dsp(
+	t_pan_tilde *x, //pointer to the class data space
+	t_signal **sp) { //pointer to the sp array (1)
+
+	dsp_add(
+		pan_tilde_perform,//performing routine
+		5,		//number of the following pointers to variables passed
+				//to the pan_tilde_perform routine
+		x,		//pointer to the data space 
+		sp[0]->s_vec, 	//first in-signal (2)
+		sp[1]->s_vec, 	//second in-signal
+		sp[2]->s_vec, 	//out-signal
+		sp[0]->s_n);	//pointer to the length of the signal (3)
+
+}
+
+/*------------------------SP, S_VEC AND S_N----------------------------
+1- SP:The vector sp is an array of signals containing pointers to each 
+signal in object. The signals are read in the graphical representation 
+clockwisely. Each signal sp[n] has a pointer ().s_vec (array of t_samples)
+and the length of this signal-vector ().s_n
+
+2-S_VEC: pointer to the signal vector (array of sample of type t_sample)
+
+3-S_N: length of the signal vector
+---------------------------------------------------------------*/
+
+/***************************CONSTRUCTOR***************************/
+void pan_tilde_free(t_pan_tilde *x) {
+	inlet_free(x->x_in2); //free the inlet x_in2
+	inlet_free(x->x_in3);
+	outlet_free(x->x_out); //free the output x_out
+}
+
+/*As the first inlet is generated automatically it is also freed automatically, so
+no inlet_free is needed*/
+
+/***************************CONSTRUCTOR***************************/
+
+void *pan_tilde_new(   //Constructor function
+	t_floatarg f)  //float argument
+{
+	
+	t_pan_tilde *x = //pointer *x to a t_pan_tilde object
+		(t_pan_tilde *) pd_new(pan_tilde_class); 	// creates (casts) a new pointer to a t_pan_tilde
+
+	x-> f_pan = f; //set the mixing factor to the argument f********************************************************
+	
+	x-> x_in2 = inlet_new(	// new inlet
+		&x->x_obj,	//pointer to the internal object (necessary)
+		&x->x_obj.ob_pd,//pointer to the graphical representation
+		&s_signal, 	//reference to the symbolic selector "signal"
+		&s_signal); 	//also symbolic selector "signal"
+
+	x-> x_in3 = floatinlet_new(
+		&x->x_obj,	//points to the internal object
+		&x->f_pan); 	//writes  the input data from inlet 3
+
+	x-> x_out = outlet_new(
+		&x->x_obj, //pointer to the internal object
+		&s_signal);//selector "signal"
+
+	return (void *)x;
+}
+
+
+/***************************SETUP***************************/
+void pan_tilde_setup(void) {
+	pan_tilde_class=class_new	//Create the new class
+		(gensym("pan~"),		//symbolic name of the class
+		(t_newmethod)pan_tilde_new,//constructor (called when PD instantiates a new object)
+		(t_method)pan_tilde_free, //destructor (needed to free the resources)
+		sizeof(t_pan_tilde),	//logic space of the object
+		CLASS_DEFAULT, 		//graphical representation of the object
+		A_DEFFLOAT, 		//float input
+		0); 			//0 indicate the ending of the list of arguments
+	
+	class_addmethod(		//new method 
+		pan_tilde_class, 	//belonging class
+		(t_method)pan_tilde_dsp,//defines the method
+		gensym("dsp"),		//defining the method for dsp (1)
+		0); 			//adding the method reset
+
+	CLASS_MAINSIGNALIN(	//(2)
+		pan_tilde_class,//pointer to the signal class
+		t_pan_tilde, 	//pointer to the class's data space
+		f);		//(3)this is a dummy-variable out of the data space
+				
+//class_sethelpsymbol(pan_tilde_class, gensym("help-pan_tilde")); //help location for the pan_tilde class
+}
+/*----------------------DSP INITIALIZATION------------------------------------------------
+ 1- When PD audio generator is started a message with the selector "dsp" is sent to 
+    each object. Each class that has a method for the dsp message is recognized as a
+    signal class. 
+ 2- signal classes that want to provide signal-inlets have to declare this via the 
+    CLASS_MAINSIGNALIN macro. This enables signals at the first (default) inlet. If 
+    more than one signal-inlet is needed, they have to be created explicitly in the
+    constructor method. Inlets that are declared as signal-inlets cannot provide methods
+    for float messages any longer.
+ 3- The last argument of CLASS_MAINSIGNALIN is a dummy variable out of the data space that
+    is needed to replace non-existing signal at the signal-inlet(s) with t_float messages
+-----------------------------------------------------------------------------------------*/

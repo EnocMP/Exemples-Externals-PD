@@ -1,0 +1,41 @@
+#N canvas 550 95 697 546 10;
+#X floatatom 342 411 5 0 0 0 - - -;
+#X obj 397 415 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 211 406 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X text 213 211 1 - Lower Limit;
+#X text 213 224 2 - Upper Limit;
+#X text 214 237 3 -Step;
+#X msg 244 258 10 40 4;
+#X msg 518 344 3;
+#X msg 564 345 5;
+#X msg 479 344 1;
+#X text 501 322 Step;
+#X msg 333 258 5 30;
+#X text 330 227 1 - Lower Limit;
+#X msg 455 263 43;
+#X text 330 240 2 - Lower Limit;
+#X text 439 242 Upper Limit;
+#X text 340 256;
+#X floatatom 598 252 5 0 0 0 - - -;
+#X obj 596 220 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X msg 463 194 symbol set 5;
+#X msg 136 319 set 3;
+#X msg 139 251 reset;
+#X obj 343 357 counter;
+#X connect 2 0 22 0;
+#X connect 6 0 22 1;
+#X connect 7 0 22 2;
+#X connect 8 0 22 2;
+#X connect 9 0 22 2;
+#X connect 11 0 22 1;
+#X connect 13 0 22 1;
+#X connect 17 0 22 1;
+#X connect 18 0 17 0;
+#X connect 19 0 22 1;
+#X connect 20 0 22 0;
+#X connect 21 0 22 0;
+#X connect 22 0 0 0;
+#X connect 22 1 1 0;

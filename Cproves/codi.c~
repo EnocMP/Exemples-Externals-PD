@@ -1,0 +1,6 @@
+#include "lib.h"
+
+void main (){
+	funcio1();
+	funcio2();
+}

@@ -1,0 +1,81 @@
+#N canvas 456 85 626 714 10;
+#X obj -69 5 cnv 15 552 40 empty \$0-pddp.cnv.header Envelope~ 3 12
+0 18 -204280 -1 0;
+#X obj -69 344 cnv 3 550 3 empty \$0-pddp.cnv.inlets inlets 8 12 0
+13 -228856 -1 0;
+#X obj -69 443 cnv 3 550 3 empty \$0-pddp.cnv.outlets outlets 8 12
+0 13 -228856 -1 0;
+#X obj -69 479 cnv 3 550 3 empty \$0-pddp.cnv.argument arguments 8
+12 0 13 -228856 -1 0;
+#X obj -68 524 cnv 3 550 3 empty \$0-pddp.cnv.more_info more_info 8
+12 0 13 -228856 -1 0;
+#X obj 386 56 pddp/dsp;
+#X text -67 28 Linear ADSR envelope generator;
+#X obj 411 14 envelope~;
+#X text 28 354 0 -Signal: Signal where the envelope is applid;
+#X text 28 365 1 -Float: Attack time value (ms);
+#X text 29 376 2 -Float: Decay time value (ms);
+#X text 29 387 3 -Float: Sustain value ( from 0 to 1);
+#X text 29 398 4 -Float: Release time value (ms);
+#X text 30 410 6 -Float: Key trigger \, when a 1 is received starts
+the attack \, when a 0 is received starts de release;
+#X text 12 497 None;
+#X obj -7 225 mtof;
+#X msg -7 202 55;
+#X obj 87 263 envelope~;
+#X obj 40 86 vsl 15 128 0 2000 0 1 empty empty empty 0 -9 0 10 -262144
+-1 -1 6400 1;
+#X floatatom 40 225 5 0 0 0 - - -;
+#X obj 85 85 vsl 15 128 0 2000 0 1 empty empty empty 0 -9 0 10 -262144
+-1 -1 4000 1;
+#X floatatom 85 224 5 0 0 0 - - -;
+#X obj 132 83 vsl 15 128 0 1 0 1 empty empty empty 0 -9 0 10 -262144
+-1 -1 2700 1;
+#X floatatom 132 222 5 0 0 0 - - -;
+#X obj 175 82 vsl 15 128 0 2000 0 1 empty empty empty 0 -9 0 10 -262144
+-1 -1 7600 1;
+#X floatatom 175 222 5 0 0 0 - - -;
+#X obj -7 178 r b;
+#X obj -7 247 phasor~;
+#X obj 213 182 cnv 15 130 100 empty empty Start_Envelope 5 12 0 14
+-4032 -66577 0;
+#X obj 223 234 s b;
+#X text 244 204 start;
+#X text 279 203 stop;
+#X obj 285 220 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 250 221 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144
+-1 -1;
+#X obj 285 244 nbx 2 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-262144 -1 -1 0 256;
+#X obj 250 245 nbx 2 14 -1e+37 1e+37 0 1 empty empty empty 0 -8 0 10
+-262144 -1 -1 1 256;
+#X text 30 450 signal multiplying the input and the generated envelope
+;
+#X text 32 539 - sets the initial frequency. If the argument is supplied
+\, [osc~] takes floating-point messages to change frequency. If no
+argument is supplied \, the input is taken to be an audio signal.;
+#X obj 80 295 dac~;
+#X text 117 63 Sustain;
+#X text 165 61 Release;
+#X text 27 67 Attack;
+#X text 77 65 Decay;
+#X connect 15 0 27 0;
+#X connect 16 0 15 0;
+#X connect 17 0 38 0;
+#X connect 17 0 38 1;
+#X connect 18 0 19 0;
+#X connect 19 0 17 1;
+#X connect 20 0 21 0;
+#X connect 21 0 17 2;
+#X connect 22 0 23 0;
+#X connect 23 0 17 3;
+#X connect 24 0 25 0;
+#X connect 25 0 17 4;
+#X connect 26 0 16 0;
+#X connect 27 0 17 0;
+#X connect 32 0 34 0;
+#X connect 33 0 29 0;
+#X connect 33 0 35 0;
+#X connect 34 0 17 5;
+#X connect 35 0 17 5;
